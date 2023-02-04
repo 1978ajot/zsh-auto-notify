@@ -23,6 +23,17 @@ export AUTO_NOTIFY_VERSION="0.8.0"
         'nano'
     )
 
+function _describe_elapsed() { 
+    if [[ $1 -lt 86400 ]]; then
+        _elapsed=`date --utc --date="@$1" '+%H:%M:%S'`
+    else
+        day_of_year=$(( `date --utc --date="@${1}" +%j` - 1 ))
+        time_of_day=`date --utc --date="@${1}" "+%H:%M:%S"`
+        _elapsed="${day_of_year}d +$time_of_day"
+    fi
+    printf "%s" "$_elapsed"
+}
+
 function _auto_notify_format() {
     local MESSAGE="$1"
     local command="$2"
@@ -36,7 +47,7 @@ function _auto_notify_format() {
 
 function _auto_notify_message() {
     local command="$1"
-    local elapsed="$2"
+	local elapsed=$(_describe_elapsed $2)
     local exit_code="$3"
     local platform="$(uname)"
     # Run using echo -e in order to make sure notify-send picks up new line
